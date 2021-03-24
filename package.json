@@ -1,0 +1,24 @@
+{
+  "name": "ClipCat",
+  "version": "0.1.0",
+  "description": "Gets and combines clips",
+  "main": "app/index.js",
+  "repository": {
+    "url": "https://github.com/n4n0byte/ClipCat.git",
+    "type": "git"
+  },
+  "author": "Ali coopnukem@gmail.com",
+  "license": "Proprietary",
+  "private": true,
+  "devDependencies": {
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.3",
+    "watch": "^1.0.2"
+  },
+  "scripts": {
+    "run": "ts-node app/index.ts"
+  },
+  "dependencies": {
+    "@unaxiom/ffmpeg": "^0.1.2"
+  }
+}
