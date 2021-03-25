@@ -33,12 +33,9 @@ function ClipListCallback(data:any){
     }
  }
 
-while(true){
-    if(ids.length == streamerList.length){
-        break;
-    } else {
-        setTimeout(() => {
-            console.log(ids.length + " : " + streamerList.length);
-        }, 1000)
-    }
-}
+
+ setTimeout(() => {
+    console.log(ids.length + " : " + streamerList.length);
+    console.log(ids)
+}, 1000)
+
