@@ -63,7 +63,7 @@ export default class APIManager {
     }
 
     // match regex and reform clip asset link
-    static makeClipLink(clipLink: string) {
+    makeClipLink(clipLink: string) {
         return `https://production.assets.clips.twitchcdn.net/${clipLink.match(this.regex)[1]}.mp4`;
     }
 

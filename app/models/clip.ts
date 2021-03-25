@@ -1,3 +1,5 @@
+import APIManager from "../clipDownloader/apiManager";
+
 export default class Clip {
 
     readonly name:string;
@@ -7,13 +9,18 @@ export default class Clip {
     readonly gameid:number;
     readonly title:string;
     readonly viewCount:string;
-    readonly date:Date;
+    readonly date:string;
 
     constructor(rawClip:any){
+        var manager = new APIManager();
         this.name = rawClip.broadcaster_name;
-        this.clipUrl = 
+        this.clipUrl = manager.makeClipLink(rawClip.thumbnail_url);
         this.twitchVodUrl = rawClip.url;
-        
+        this.streamerId = rawClip.broadcaster_name;
+        this.gameid = rawClip.game_id;
+        this.title = rawClip.title;
+        this.viewCount = rawClip.view_count;
+        this.date = rawClip.created_at;
     }
 
 }
