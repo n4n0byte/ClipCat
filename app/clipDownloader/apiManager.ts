@@ -1,10 +1,12 @@
 import { exception } from "console";
+import Clip from "../models/clip";
 
 const axios = require('axios').default;
 axios.defaults.headers.get['Authorization'] = `Bearer ${process.env.ACCESS_TOKEN}` as string;
 axios.defaults.headers.get['Client-Id'] = process.env.CLIENT_ID as string;
 const https = require("https");
 const fs = require("fs");
+const download = require("download");
 const Stream = require("stream").Transform;
 
 export default class APIManager {
@@ -17,6 +19,8 @@ export default class APIManager {
             'Client-Id': process.env.CLIENT_ID
         }
     }
+
+
 
     getBroadcasterId(name: string, callback: any): number {
         let data = "";
@@ -40,6 +44,23 @@ export default class APIManager {
         return res;
     }
 
+    downloadClips(clips: Clip[]) {
+        var location = "clips/";
+
+        clips.forEach(clip => {
+            var download = function (url:any, dest:any, cb:any) {
+                var file = fs.createWriteStream(dest);
+                https.get(url, function (response:any) {
+                    response.pipe(file);
+                    file.on('finish', function () {
+                        file.close(cb);
+                    });
+                });
+            }
+            download(clip.clipUrl, `${location}/${clip.streamerId}+${clip.viewCount}.mp4`,()=>{console.log("success")});
+        });
+
+    }
 
     getClips(id: number, callback: any) {
         let data = "";
