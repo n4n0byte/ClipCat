@@ -5,7 +5,7 @@ import Clip from "./models/clip";
 const manager = new APIManager()
 
 var streamerList = ["ludwig", "Sykkuno", "CohhCarnage", "sodapoppin", "Mizkif", "Greekgodx", "EsfandTV"]
-var test = [] as any;
+var test = [] as any[];
 var ids = [] as number[];
 var processedVodList = [] as Clip[];
 
@@ -24,8 +24,7 @@ function ClipListCallback(data: any) {
     });
 
     if (ids.length == streamerList.length) {
-        // do stuff
-
+      
         test.forEach((clip: any) => {
             processedVodList.push(new Clip(clip));
         });
