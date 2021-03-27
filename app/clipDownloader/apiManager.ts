@@ -10,12 +10,18 @@ const fs = require("fs");
 export default class APIManager {
 
     private regex = "https:\/\/clips-media-assets2\.twitch\.tv\/(.*)-p" as string;
-
+    private endDate:Date = new Date();
+    private startDate:Date = new Date();
+    
     private options = {
         headers: {
             Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
             'Client-Id': process.env.CLIENT_ID
         }
+    }
+
+    constructor(private dateInterval: number = 1){
+        this.startDate.setDate(this.startDate.getDate()-this.dateInterval);
     }
 
     getBroadcasterId(name: string, callback: any): number {
@@ -44,7 +50,8 @@ export default class APIManager {
     getClips(id: number, callback: any) {
         let data = "";
         let processedJson: any = {};
-        https.get(`https://api.twitch.tv/helix/clips?broadcaster_id=${id}`, this.options, (resp: any) => {
+        
+        https.get(`https://api.twitch.tv/helix/clips?broadcaster_id=${id}&created_at=${this.startDate.toISOString()}&ended_at=${this.endDate.toISOString()}`, this.options, (resp: any) => {
 
             // A chunk of data has been recieved.
             resp.on("data", (chunk: any) => {
@@ -78,7 +85,8 @@ export default class APIManager {
                     console.log(err);
                     console.log(clip);
                     console.log("Error Downloading");
-                    fs.unlink(location); // Delete the file async. (But we don't check the result)                    
+                    fs.unlink(location,()=>{console.log(`deleted file: ${location}`);
+                    }); // Delete the file async. (But we don't check the result)                    
                 });
             https.get(clip.clipUrl, function (response: any) {
                 console.log('statusCode:', response.statusCode);

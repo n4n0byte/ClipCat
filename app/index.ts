@@ -6,11 +6,12 @@ import Clip from "./models/clip";
 const manager = new APIManager();
 const clipMerger = new ClipMerger();
 
-var streamerList = ["ludwig", "Sykkuno", "CohhCarnage", "sodapoppin", "Mizkif", "Greekgodx", "Trainwreckstv"]
+var streamerList = ["ludwig", "Sykkuno", "HasanAbi", "sodapoppin", "Mizkif", "xQcOW", "Trainwreckstv"]
 var test = [] as any;
 var ids = [] as number[];
 var processedVodList = [] as Clip[];
 var args = process.argv.slice(2);
+var numberOfClips = 30;
 
 function broadcasterIdCallback(data: any) {
     manager.getClips(data, ClipListCallback);
@@ -33,7 +34,7 @@ function ClipListCallback(data: any) {
         processedVodList.sort((lhs, rhs) => { return rhs.viewCount - lhs.viewCount })
 
         // get first X clips
-        var selectedClips = processedVodList.slice(0, 5) as Clip[];
+        var selectedClips = processedVodList.slice(0, numberOfClips) as Clip[];
 
         // download selected clips
         manager.downloadClips(selectedClips);
@@ -42,6 +43,7 @@ function ClipListCallback(data: any) {
 }
 
 if (args.length == 0){
+
     streamerList.forEach(element => {
         manager.getBroadcasterId(element, broadcasterIdCallback);
     });    
