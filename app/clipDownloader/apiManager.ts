@@ -50,8 +50,9 @@ export default class APIManager {
     getClips(id: number, callback: any) {
         let data = "";
         let processedJson: any = {};
+        // console.log(`https://api.twitch.tv/helix/clips?broadcaster_id=${id}&created_at=${this.startDate.toISOString()}&ended_at=${this.endDate.toISOString()}`);
         
-        https.get(`https://api.twitch.tv/helix/clips?broadcaster_id=${id}&created_at=${this.startDate.toISOString()}&ended_at=${this.endDate.toISOString()}`, this.options, (resp: any) => {
+        https.get(`https://api.twitch.tv/helix/clips?broadcaster_id=${id}&started_at=${this.startDate.toISOString()}&ended_at=${this.endDate.toISOString()}`, this.options, (resp: any) => {
 
             // A chunk of data has been recieved.
             resp.on("data", (chunk: any) => {
@@ -90,7 +91,7 @@ export default class APIManager {
                 });
             https.get(clip.clipUrl, function (response: any) {
                 console.log('statusCode:', response.statusCode);
-                console.log(clip.title);
+                console.log(`${clip.title} : ${clip.date}`);
                 response.pipe(file);
             }).on('error', (err: any) => {
                 console.log(err);
