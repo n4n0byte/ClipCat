@@ -1,4 +1,5 @@
 import { exception } from "console";
+import Clip from "../models/clip";
 
 const axios = require('axios').default;
 axios.defaults.headers.get['Authorization'] = `Bearer ${process.env.ACCESS_TOKEN}` as string;
@@ -65,6 +66,22 @@ export default class APIManager {
     // match regex and reform clip asset link
     makeClipLink(clipLink: string) {
         return `https://production.assets.clips.twitchcdn.net/${clipLink.match(this.regex)[1]}.mp4`;
+    }
+
+    downloadClips(clips: Clip[]) {
+        var root = "./clips/";
+
+        clips.forEach(clip => {
+            var location = `${root}${clip.name}${clip.streamerId}.mp4`;
+            const file = fs.createWriteStream(location)
+                .on('error', function (err: any) { // Handle errors
+                    console.log(err)
+                    fs.unlink(location); // Delete the file async. (But we don't check the result)                    
+                });
+            const request = https.get(clip.clipUrl, function (response: any) {
+                response.pipe(file);
+            });
+        });
     }
 
     // async getClipsWithUsername(broadcasterName: string) {
