@@ -16,7 +16,8 @@
     "watch": "^1.0.2"
   },
   "scripts": {
-    "run": "ts-node app/index.ts"
+    "get-clips": "ts-node app/index.ts",
+    "merge-clips": "app/index.ts upscale; yarn run ts-node  app/index.ts mark; yarn run ts-node  app/index.ts merge"
   },
   "dependencies": {
     "@types/node": "^14.14.37",
@@ -24,7 +25,6 @@
     "axios": "^0.21.1",
     "dotenv": "^8.2.0",
     "eslint": "^7.22.0",
-    "express": "^4.17.1",
     "fluent-ffmpeg": "https://github.com/n4n0byte/node-fluent-ffmpeg"
   }
 }
