@@ -4,7 +4,7 @@ import Clip from "./models/clip";
 
 const manager = new APIManager()
 
-var streamerList = ["ludwig", "Sykkuno", "CohhCarnage", "sodapoppin", "Mizkif", "Greekgodx", "EsfandTV"]
+var streamerList = ["xQcOW", "ludwig", "Sykkuno", "CohhCarnage", "sodapoppin", "Mizkif", "Greekgodx", "Trainwreckstv"]
 var test = [] as any;
 var ids = [] as number[];
 var processedVodList = [] as Clip[];
@@ -34,9 +34,7 @@ function ClipListCallback(data: any) {
         processedVodList.sort((lhs, rhs) => { return rhs.viewCount - lhs.viewCount })
 
         // get first X clips
-        var selectedClips = processedVodList.slice(0, 15) as Clip[];
-
-        console.log(selectedClips);
+        var selectedClips = processedVodList.slice(0, 30) as Clip[];
 
         // download selected clips
         manager.downloadClips(selectedClips);

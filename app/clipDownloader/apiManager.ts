@@ -7,7 +7,6 @@ axios.defaults.headers.get['Client-Id'] = process.env.CLIENT_ID as string;
 const https = require("https");
 const fs = require("fs");
 const Stream = require("stream").Transform;
-
 export default class APIManager {
 
     private regex = "https:\/\/clips-media-assets2\.twitch\.tv\/(.*)-p" as string;
@@ -72,20 +71,22 @@ export default class APIManager {
         var root = "./clips/";
 
         clips.forEach(clip => {
-            var location = `${root}${clip.name}${clip.streamerId}.mp4`;
+            var location = `${root}${clip.viewCount}${clip.name}${clip.streamerId} ${clip.title}.mp4`;
             const file = fs.createWriteStream(location)
                 .on('error', function (err: any) { // Handle errors
-                    console.log(err)
+                    console.log(err);
+                    console.log(clip);
+                    console.log("Error Downloading");
                     fs.unlink(location); // Delete the file async. (But we don't check the result)                    
                 });
-            const request = https.get(clip.clipUrl, function (response: any) {
+            https.get(clip.clipUrl, function (response: any) {
+                console.log('statusCode:', response.statusCode);
+                console.log(clip.title);
+                
                 response.pipe(file);
+            }).on('error', (err: any)=>{
+                console.log(err);                
             });
         });
     }
-
-    // async getClipsWithUsername(broadcasterName: string) {
-    //     return this.getClips(await this.getBroadcasterId(broadcasterName));
-    // }
-
 }
