@@ -2,16 +2,14 @@ require('dotenv').config();
 import APIManager from "./clipDownloader/apiManager";
 import Clip from "./models/clip";
 
-const manager = new APIManager()
+const manager = new APIManager();
+const clipMerger = new ClipMerger();
 
-var streamerList = ["xQcOW", "ludwig", "Sykkuno", "CohhCarnage", "sodapoppin", "Mizkif", "Greekgodx", "Trainwreckstv"]
+var streamerList = ["ludwig", "Sykkuno", "CohhCarnage", "sodapoppin", "Mizkif", "Greekgodx", "Trainwreckstv"]
 var test = [] as any;
 var ids = [] as number[];
 var processedVodList = [] as Clip[];
-
-streamerList.forEach(element => {
-    manager.getBroadcasterId(element, broadcasterIdCallback);
-});
+var args = process.argv.slice(2);
 
 function broadcasterIdCallback(data: any) {
     manager.getClips(data, ClipListCallback);
@@ -34,10 +32,21 @@ function ClipListCallback(data: any) {
         processedVodList.sort((lhs, rhs) => { return rhs.viewCount - lhs.viewCount })
 
         // get first X clips
-        var selectedClips = processedVodList.slice(0, 30) as Clip[];
+        var selectedClips = processedVodList.slice(0, 50) as Clip[];
 
         // download selected clips
         manager.downloadClips(selectedClips);
         
+    }
+}
+
+if (args.length == 0){
+    streamerList.forEach(element => {
+        manager.getBroadcasterId(element, broadcasterIdCallback);
+    });    
+} else{
+    if (args[0] == "merge"){
+        console.log('merging');
+        clipMerger.mergeSelectedClips();
     }
 }
