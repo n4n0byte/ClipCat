@@ -1,5 +1,6 @@
 require('dotenv').config();
 import APIManager from "./clipDownloader/apiManager";
+import ClipMerger from "./clipMerger/clipMerger";
 import Clip from "./models/clip";
 
 const manager = new APIManager();
@@ -46,7 +47,8 @@ if (args.length == 0){
     });    
 } else{
     if (args[0] == "merge"){
-        console.log('merging');
+        
+        clipMerger.BatchNormalizeClipResolutions();
         clipMerger.mergeSelectedClips();
     }
 }
