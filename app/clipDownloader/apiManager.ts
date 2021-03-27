@@ -6,7 +6,7 @@ axios.defaults.headers.get['Authorization'] = `Bearer ${process.env.ACCESS_TOKEN
 axios.defaults.headers.get['Client-Id'] = process.env.CLIENT_ID as string;
 const https = require("https");
 const fs = require("fs");
-const Stream = require("stream").Transform;
+
 export default class APIManager {
 
     private regex = "https:\/\/clips-media-assets2\.twitch\.tv\/(.*)-p" as string;
@@ -43,7 +43,7 @@ export default class APIManager {
 
     getClips(id: number, callback: any) {
         let data = "";
-
+        let processedJson: any = {};
         https.get(`https://api.twitch.tv/helix/clips?broadcaster_id=${id}`, this.options, (resp: any) => {
 
             // A chunk of data has been recieved.
@@ -53,7 +53,8 @@ export default class APIManager {
 
             // The whole response has been received. Print out the result.
             resp.on("end", () => {
-                callback(JSON.parse(data))
+                processedJson = JSON.parse(data);
+                callback(processedJson);
             });
         })
             .on("error", (err: any) => {
@@ -69,9 +70,9 @@ export default class APIManager {
 
     downloadClips(clips: Clip[]) {
         var root = "./clips/";
-
+        var delimiter = '[[--+';
         clips.forEach(clip => {
-            var location = `${root}${clip.viewCount}${clip.name}${clip.streamerId} ${clip.title}.mp4`;
+            var location = `${root}${delimiter}${clip.viewCount}${delimiter}${clip.name}${delimiter}${clip.streamerId}${delimiter}${clip.title}${delimiter}.mp4`;
             const file = fs.createWriteStream(location)
                 .on('error', function (err: any) { // Handle errors
                     console.log(err);
@@ -82,10 +83,11 @@ export default class APIManager {
             https.get(clip.clipUrl, function (response: any) {
                 console.log('statusCode:', response.statusCode);
                 console.log(clip.title);
-                
                 response.pipe(file);
-            }).on('error', (err: any)=>{
-                console.log(err);                
+            }).on('error', (err: any) => {
+                console.log(err);
+            }).on('end', () => {
+                console.log(`finished downloading: ${clip.title}`);
             });
         });
     }

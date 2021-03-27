@@ -33,7 +33,7 @@ function ClipListCallback(data: any) {
         processedVodList.sort((lhs, rhs) => { return rhs.viewCount - lhs.viewCount })
 
         // get first X clips
-        var selectedClips = processedVodList.slice(0, 50) as Clip[];
+        var selectedClips = processedVodList.slice(0, 5) as Clip[];
 
         // download selected clips
         manager.downloadClips(selectedClips);
@@ -47,8 +47,9 @@ if (args.length == 0){
     });    
 } else{
     if (args[0] == "merge"){
-        
-        clipMerger.BatchNormalizeClipResolutions();
-        clipMerger.mergeSelectedClips();
+        clipMerger.BatchUpscaleClipResolutions();
+    }
+    if (args[0] == "mark"){
+        clipMerger.markClips();
     }
 }
