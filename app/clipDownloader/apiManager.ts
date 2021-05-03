@@ -20,7 +20,7 @@ export default class APIManager {
         }
     }
 
-    constructor(private dateInterval: number = 1){
+    constructor(private dateInterval: number = 3){
         this.startDate.setDate(this.startDate.getDate()-this.dateInterval);
     }
 
@@ -75,6 +75,8 @@ export default class APIManager {
     makeClipLink(clipLink: string) {
         return `https://production.assets.clips.twitchcdn.net/${clipLink.match(this.regex)[1]}.mp4`;
     }
+
+    
 
     downloadClips(clips: Clip[]) {
         var root = "./clips/";

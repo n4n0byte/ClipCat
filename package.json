@@ -17,8 +17,13 @@
   },
   "scripts": {
     "get-clips": "ts-node app/index.ts",
-    "merge-clips": "app/index.ts upscale; yarn run ts-node  app/index.ts mark; yarn run ts-node  app/index.ts merge"
-  },
+    "merge-clips": "ts-node app/index.ts upscale && ts-node app/index.ts mark && ts-node app/index.ts merge",
+    "mark": "ts-node app/index.ts mark",
+    "upscale": "ts-node app/index.ts upscale",
+    "merge": "ts-node app/index.ts merge",
+    "ffmpeg": "ts-node app/index.ts ffmpeg",
+    "credits": "ts-node app/index.ts credits"
+  },  
   "dependencies": {
     "@types/node": "^14.14.37",
     "@unaxiom/ffmpeg": "^0.1.2",

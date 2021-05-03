@@ -3,20 +3,21 @@ const ffmpeg = require('fluent-ffmpeg');
 const fs = require('fs')
 export default class ClipMerger {
     private unprocessedVideos: string[] = [];
-    private selectedClipsFolder: string = "./selectedClips/";
 
-    constructor(selectedClipsFolder?: string) {
+    constructor(private selectedClipsFolder:string = "./selectedClips/") {
         // get filenames of selected videos and store them
         fs.readdirSync(this.selectedClipsFolder).forEach((filename: any) => {
             this.unprocessedVideos.push(this.selectedClipsFolder + filename);
         });
     }
 
+    
+
     markClips() {
         // const splits = myString.split()
         this.unprocessedVideos.forEach(clipPath => {
             var relativeClipPath = clipPath.slice(clipPath.lastIndexOf('/') + 1, clipPath.length);
-            var fileSplit = relativeClipPath.split('[[--+')
+            var fileSplit = relativeClipPath.split('[[--+');
             var clipTitle = fileSplit[4];
             var streamerName = fileSplit[2];
             var fontColor = 'white';
@@ -25,6 +26,8 @@ export default class ClipMerger {
             var fSize = 40;
 
             ffmpeg(clipPath)
+                .inputOptions('-vsync 0')
+                .inputOptions('-hwaccel cuda')
                 .videoFilters({
                     filter: 'drawtext',
                     options: {
@@ -42,7 +45,7 @@ export default class ClipMerger {
                 .videoFilters({
                     filter: 'drawtext',
                     options: {
-                        fontfile: process.env.BOLD_FONT_PATH,
+                        fontfile: process.env.NORMAL_FONT_PATH,
                         text: clipTitle,
                         fontsize: fSize,
                         fontcolor: fontColor,
@@ -53,15 +56,35 @@ export default class ClipMerger {
                         shadowy: 2,
                     }
                 })
-
                 .on('end', () => {
                     console.log(`finished marking: ${clipTitle}`);
                     this.deleteOldFile(clipPath);
                 })
+
                 .save(`${clipPath}-marked.mp4`);
         })
     }
 
+
+    generateAttributions(){
+        var attribution = "Credits\n";
+        var attributionList:string[] = [];
+        this.unprocessedVideos.forEach(clipPath => {
+            
+            var relativeClipPath = clipPath.slice(clipPath.lastIndexOf('/') + 1, clipPath.length);
+            var fileSplit = relativeClipPath.split('[[--+');
+            var streamerName = fileSplit[2];
+            var curAttribution = `${streamerName} twitch.tv/${streamerName}\n`;
+
+            // prevent dupe attributions
+            if(!attributionList.includes(curAttribution)){
+                attribution += curAttribution;
+                attributionList.push(curAttribution);
+            }
+        });
+        fs.writeFile('./attriutions.txt', attribution, ()=>{console.log('finished writing attributions');
+        });
+    }
 
     BatchUpscaleClipResolutions() {
         console.log('Checking for clips to upscale');
@@ -77,12 +100,23 @@ export default class ClipMerger {
                     console.dir(`processing ${clipPath} ${metadata.streams[0].codec_name} ${metadata.streams[0].width}x${metadata.streams[0].height}`);
 
                     ffmpeg(clipPath)
+                        .inputOptions('-vsync 0')
+                        .inputOptions('-hwaccel cuda')    
                         .size('1920x1080')
                         .output(upscaledFilePath)
                         .on('end', () => {
                             console.log(`finished upscaling ${clipPath}`);
                             console.log(clipPath)
-                            this.deleteOldFile(clipPath);
+
+                            console.log(`deleting: ${clipPath}`);
+        
+                            fs.unlinkSync(clipPath, (err: string) => {
+                                if (err) {
+                                    console.error(err + "\nFailed to delete old clip")
+                                    return;
+                                }
+                                console.log(`Successfully deleted ${clipPath}`);
+                            })
                         })
                         .on('error', (err: string) => {
                             console.log(err);
@@ -118,15 +152,18 @@ export default class ClipMerger {
 
         ffmpeg()
             .inputPathArray(this.unprocessedVideos)
+            .inputOptions('-vsync 0')
+            .inputOptions('-hwaccel cuda')    
             .on('end', () => {
                 console.log("finished merging clips");
-                this.normalizeAudio();
+                // this.normalizeAudio();
             })
             .on('error', function (err: { message: string; }) {
                 console.log('An error occurred: ' + err.message);
             })
             .mergeToFile('mergedFile.mp4', '.');
     }
+
 
     deleteOldFile(path:string){
         console.log(`deleting: ${path}`);
